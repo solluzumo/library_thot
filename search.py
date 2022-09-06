@@ -1,19 +1,6 @@
 #---Book search---
+def book_search(text):
+    return text
 
-def search_book_by_name(name):
-    return name
-
-
-def search_book_by_genre(genre):
-    return genre
-
-
-def search_book_by_author(author):
-    return author
-
-
-#---Book search in library---
-
-def search_book_in_library(username,book_name):
-    return username, book_name
-
+def review_search(text):
+    return text
