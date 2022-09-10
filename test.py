@@ -1,2 +1,4 @@
-a = "/d dfdf dfdf "
-print(a.split("/d")[1].strip())
+
+a = "asdfsad\n11111\n,,,,,,"
+
+print("".join(map(str,a.split("\n"))))
