@@ -2,7 +2,9 @@ CREATE TABLE book(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name VARCHAR(50),
     genre VARCHAR(50),
-    author VARCHAR(50)
+    author VARCHAR(50),
+    reviews_path VARCHAR(50),
+    file_path VARCHAR(50),
     );
 
 CREATE TABLE users(

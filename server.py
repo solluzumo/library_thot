@@ -1,10 +1,13 @@
 import logging
+from typing import List
+
 from search import *
 from loguru import logger
 from aiogram import Bot, Dispatcher, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.utils import executor
-
+import db
+import grabber
 
 logger.add("./db/logs/errors.log",format="{time} {level} {message}",
            level="DEBUG", rotation="10 MB", compression="zip")
@@ -21,24 +24,32 @@ async def send_welcome(message: types.Message):
     user_name = types.User.get_current().first_name
     welcome_text = open("./text/welcome",encoding="utf-8").read()
     await message.answer(welcome_text)
+async def get_data(message: types.Message, command:str, columns: List[str]):
+    if len(message.text.split())>1:
+        datas = db.fetchall("book", message.text.split(f"/{command}")[1],columns)
 
+    else:
+        await message.answer(f"Пожалуйста, после комманды /{command} введите название, имя автора или жанр книги")
 @dp.message_handler(commands=['download'])
 async def download_book(message: types.Message):
-    if len(message.text.split())>1:
-        await message.answer(f"Результаты поиска: {book_search(message.text.split('/download')[1].strip())}")
-    else:
-        await message.answer("Пожалуйста, после комманды /download введите название, автора или жанр книги")
+    book_datas = get_data(message, "download",["name","author","file_path"])
+    if len(book_datas) == 0:
+        return message.answer("Мне ничего не удалось найти по вашему запросу")
+    for index,file in enumerate(book_datas):
+        await message.answer(f"{index}. {file[0]} {file[1]}")
+        await message.reply_document(open(f"./db/books_files/{file[2]}"), "rb")
+
+
+@dp.message_handler(commands=['reviews'])
+async def read_review(message: types.Message):
+    path = get_data(message, "reviews", ["reviews_path"])
+    reviews = [i for i in open(f"{path}").read().split("\n") if i!= ""]
+    for review in reviews:
+        await message.answer(review)
+
 
 @dp.message_handler(commands=['feedback'])
 async def leave_review(message: types.Message):
-    # await message.answer("Мы собираем отзывы со различных ресурсов, с полным списком ресурсов мы можете ознакомиться,"
-    #                      "введя комманду /resources")
-    if len(message.text.split()) > 1:
-        await message.answer(f"По вашему запросу найдены следующие отзывы:{book_search(message.text.split('/feedback')[1].strip())}")
-    else:
-        await message.answer("Пожалуйста, после комманды /feedback введите название книги")
-@dp.message_handler(commands=['review'])
-async def read_review(message: types.Message):
     await message.answer("Введи название книги")
 
     pass

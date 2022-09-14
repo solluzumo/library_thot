@@ -1,4 +1,2 @@
-
-a = "asdfsad\n11111\n,,,,,,"
-
-print("".join(map(str,a.split("\n"))))
+a = {"n":3}
+print(len(a))
