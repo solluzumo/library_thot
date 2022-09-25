@@ -21,15 +21,20 @@ dp = Dispatcher(bot, storage=MemoryStorage())
 
 @dp.message_handler(commands=['start', 'help'])
 async def send_welcome(message: types.Message):
-    user_name = types.User.get_current().first_name
     welcome_text = open("./text/welcome",encoding="utf-8").read()
     await message.answer(welcome_text)
+
+
+#Функция выбора данных(любых) одной или несколько книг из БД
 async def get_data(message: types.Message, command:str, columns: List[str]):
     if len(message.text.split())>1:
         datas = db.fetchall("book", message.text.split(f"/{command}")[1],columns)
 
     else:
         await message.answer(f"Пожалуйста, после комманды /{command} введите название, имя автора или жанр книги")
+
+
+#Загрузка файла книги в чат к пользователю
 @dp.message_handler(commands=['download'])
 async def download_book(message: types.Message):
     book_datas = get_data(message, "download",["name","author","file_path"])
@@ -40,6 +45,8 @@ async def download_book(message: types.Message):
         await message.reply_document(open(f"./db/books_files/{file[2]}"), "rb")
 
 
+
+#Загрузка отзывов о книге
 @dp.message_handler(commands=['reviews'])
 async def read_review(message: types.Message):
     path = get_data(message, "reviews", ["reviews_path"])
@@ -47,18 +54,20 @@ async def read_review(message: types.Message):
     for review in reviews:
         await message.answer(review)
 
-
+#Оставить отзыв о книге
 @dp.message_handler(commands=['feedback'])
 async def leave_review(message: types.Message):
     await message.answer("Введи название книги")
 
     pass
+#Случайная книга
 @dp.message_handler(commands=['random'])
 async def random_book(message: types.Message):
     pass
+#Рекомендации
 @dp.message_handler(commands=['recommended'])
 async def recommended_book(message: types.Message):
-    await message.answer("Основываясь на запрашиваемых для скачивания книгах и отзывах, я подобрал следующий список:")
+    await message.answer("Рекомендую к прочтению: ")
     pass
 
 
